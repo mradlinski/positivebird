@@ -123,7 +123,7 @@ def transform_file_sentiment140(src):
         elif sent == 4:
             res_pos.append(tweet)
 
-    csv_each(src, process_row)
+    csv_each(src, process_row, encoding='Windows-1252')
 
     return res_pos, res_neg
 

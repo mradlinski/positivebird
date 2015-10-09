@@ -18,8 +18,8 @@ def csv_map(file, f):
     return results
 
 
-def csv_each(file, f):
-    with open(file, 'r') as fcsv:
+def csv_each(file, f, encoding='UTF-8'):
+    with open(file, 'r', encoding=encoding) as fcsv:
         reader = csv.reader(fcsv)
         for row in reader:
             f(row)
