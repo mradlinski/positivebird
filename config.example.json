@@ -1,8 +1,11 @@
 {
-	"consumer_key": "",
-	"consumer_secret": "",
-	"access_token": "",
-	"access_secret": "",
+	"twitter": {
+		"consumer_key": "",
+		"consumer_secret": "",
+		"access_token": "",
+		"access_secret": "",
+		"app_auth": true
+	},
 	"debug": true,
 	"used_classifier": "sentiment140_train",
 	"use_bigrams": false,

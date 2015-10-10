@@ -1,14 +1,21 @@
 from twitter import *
 from .util import get_config
 
-config = get_config()
+config = get_config()['twitter']
 
-t = Twitter(auth=OAuth(
-    config['access_token'],
-    config['access_secret'],
-    config['consumer_key'],
-    config['consumer_secret']
-))
+if config['app_auth']:
+    bearer_token = oauth2_dance(config['consumer_key'], config['consumer_secret'])
+
+    t = Twitter(auth=OAuth2(
+        bearer_token=bearer_token
+    ))
+else:
+    t = Twitter(auth=OAuth(
+        config['access_token'],
+        config['access_secret'],
+        config['consumer_key'],
+        config['consumer_secret']
+    ))
 
 
 def get_user_tweets(username):
