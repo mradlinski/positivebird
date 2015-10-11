@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>PositiveBird by mromnia</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <link rel="stylesheet" href="stylesheets/custom.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script>
+        window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0],
+                t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+                t._e.push(f);
+            };
+            return t;
+        })(document, "script", "twitter-wjs");
+    </script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <header>
+            <h1>PositiveBird</h1>
+            <p>A terribly flawed tool to check how positive someone is on Twitter!</p>
+            <p>
+				<form id="sentiment-form">
+                	<input id="tweet-input" type="text" placeholder="type somebody's username here!" />
+
+					<button type="submit">Submit</button>
+				</form>
+            </p>
+            <p class="view"><a href="http://github.com/mromnia/positivebird">View the Project on GitHub <small>mromnia/positivebird</small></a></p>
+            <ul>
+                <li><a href="https://github.com/orderedlist/minimal/zipball/master">Download <strong>ZIP File</strong></a></li>
+                <li><a href="https://github.com/orderedlist/minimal/tarball/master">Download <strong>TAR Ball</strong></a></li>
+                <li><a href="http://github.com/orderedlist/minimal">Fork On <strong>GitHub</strong></a></li>
+            </ul>
+        </header>
+        <section id="results-section">
+
+        </section>
+        <footer>
+            <p>This project is maintained by <a href="http://github.com/mromnia">mromnia</a></p>
+            <p>
+                <small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small>
+            </p>
+        </footer>
+    </div>
+
+    <script id="tweet-embed" type="text/template">
+        <div class="embedded-tweet">
+            <blockquote class="twitter-tweet" align="left" width="350" data-cards="hidden" data-conversation="none">
+                <a href="https://twitter.com/twitter/status/<%- id %>"></a>
+            </blockquote>
+        </div>
+    </script>
+
+    <script id="analysis-result" type="text/template">
+        <h2>
+            @<%- username %> was judged as...
+        </h2>
+        <div>
+            <h3 class="analysis-sentiment">
+                <p>
+                <% if(sentiment < 0.4) { %>
+                    <span class="negative">NEGATIVE!</span>
+                <% } else if(sentiment > 0.6) { %>
+                    <span class="positive">POSITIVE!</span>
+                <% } else { %>
+                    <span class="neutral">completely neutral...</span>
+                <% } %>
+                (<%- (sentiment * 100).toFixed(3) %>% positivity)
+                </p>
+
+            </h3>
+            <p>
+                <em class="show-more">Show analysed tweets...</em>
+            </p>
+        </div>
+
+        <div class="tweet-list">
+            <% for(var i = 0, len = tweets.length; i < len; ++i) { %>
+                <div class="tweet-list-element">
+                    <%= tweetTemplate({
+                        id: tweets[i].id
+                    }) %>
+                    <p>
+                        <% if(tweets[i].sentiment < 0.4) { %>
+                            <span class="negative">negative
+                        <% } else if(tweets[i].sentiment > 0.6) { %>
+                            <span class="positive">positive
+                        <% } else { %>
+                            <span class="neutral">neutral
+                        <% } %>
+                                (<%= (tweets[i].sentiment * 100).toFixed(3) %>% positivity)
+                            </span>
+                    </p>
+                </div>
+            <% } %>
+        </div>
+    </script>
+
+	<script id="loading-template" type="text/template">
+		<div class="loading-image">
+			<img src="loading.gif"/>
+		</div>
+	</script>
+
+    <script src="javascripts/scale.fix.js"></script>
+    <script src="javascripts/jquery-2.1.4.min.js"></script>
+    <script src="javascripts/underscore-min.js"></script>
+
+    <script type="text/javascript">
+        var input = $('#tweet-input');
+        var sentimentForm = $('#sentiment-form');
+        var results = $('#results-section');
+        var resultTemplate = _.template($('#analysis-result').html());
+        var tweetTemplate = _.template($('#tweet-embed').html());
+		var loadingTemplate = $('#loading-template').html();
+
+        var loadingLock = false;
+
+        function loadTweets() {
+            twttr.widgets.load();
+        }
+
+        function show(el, dur, callback) {
+            callback = callback || function() {};
+            el.fadeIn({
+                duration: dur,
+                complete: callback,
+                easing: 'linear'
+            });
+        }
+
+        function getSentiment() {
+            if(loadingLock) {
+                return;
+            }
+            loadingLock = true;
+
+            var username = input.val();
+            if (username[0] === '@')
+                username = username.substring(1);
+
+            if (!/[a-zA-Z0-9_]{1,15}/.test(username)) {
+                input.val('');
+				loadingLock = false;
+                return alert('Invalid username!');
+            }
+
+            results.html(loadingTemplate);
+
+            $.get('http://51.254.200.236/user/' + encodeURIComponent(username), function(data, statusText, jXHR) {
+                data = data.data;
+                results.html(resultTemplate({
+                    username: username,
+                    sentiment: data.avg_sentiment,
+                    tweets: data.sentiments,
+                    tweetTemplate: tweetTemplate
+                }));
+
+                show(results, 500, function() {
+                    show(results.find('.analysis-sentiment'), 2000, function() {
+                        loadingLock = false;
+                        show(results.find('.show-more'), 1000, function() {
+                            loadTweets();
+                        });
+                        results.find('.show-more').click(function() {
+                            results.find('.tweet-list').show(500);
+                        });
+                    });
+                });
+            })
+			.fail(function() {
+				results.html('An error occurred... Try again!');
+				show(results, 200, function() {
+					loadingLock = false;
+				});
+				return;
+			});
+		}
+
+        sentimentForm.submit(function(e) {
+			getSentiment();
+			e.preventDefault();
+			return false;
+		});
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+#tweet-input {
+    width: 100%;
+}
+.analysis-sentiment {
+    display: none;
+}
+.show-more {
+    display: none;
+}
+.embedded-tweet:after {
+    content: " ";
+    /* Older browser do not support empty content */
+    visibility: hidden;
+    display: block;
+    height: 0;
+    clear: both;
+}
+.tweet-list {
+    display: none;
+}
+.loading-image {
+	width: 100%;
+	text-align: center;
+}
+span.positive {
+    color: green;
+}
+span.negative {
+    color: red;
+}
+span.neutral {
+    color: grey;
+}

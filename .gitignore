@@ -1,9 +1,0 @@
-.idea/
-bin/*
-data/*
-!bin/.gitkeep
-!data/.gitkeep
-!data/sanders.csv
-__pycache__/
-.python-version
-config.json
