@@ -2,6 +2,7 @@
 bin/*
 data/*
 !bin/.gitkeep
+!bin/sentiment140_train_classifier.pickle
 !data/.gitkeep
 !data/sanders.csv
 __pycache__/

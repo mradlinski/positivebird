@@ -32,11 +32,16 @@ def calc_positivity(username):
         'id': tw[0]
     } for tw in tweets]
 
+    sent_len = len(sentiments)
+
+    if sent_len == 0:
+        return json_response(None, 'No tweets found')
+
     sentiment = functools.reduce(
         lambda x, y: x + y['sentiment'],
         sentiments,
         0
-    ) / len(sentiments)
+    ) / sent_len
 
     return json_response({
         'avg_sentiment': sentiment,

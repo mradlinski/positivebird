@@ -6,9 +6,7 @@ import nltk.classify.util
 from nltk import NaiveBayesClassifier
 from nltk import MaxentClassifier
 
-from .preprocessing import \
-    preprocess_tweet_phase1, preprocess_tweet_phase2, preprocess_tweet_phase3, \
-    tweet_to_features
+from .preprocessing import tweet_to_features, preprocess_tweet
 from .corpus_preprocessing import get_all_tweets
 from .util import get_config
 
@@ -36,14 +34,15 @@ file_names = {
     }
 }
 
-_best_unigram_cutoff = 5000
+_best_unigram_cutoff = 4765
 _best_bigram_cutoff = 200
 
 _to_remove_sentiment140 = [  # removing some quirks of the sentiment140 data
-    '447', 'airfrance',  # mentions of flight 447
+    '447', 'airfrance', 'af447',  # mentions of flight 447
     'mahon', 'mcmahon', 'ed mcmahon',  # mentions of Ed McMahon dying
-    'farrah', 'farrah fawcett',  # mentions of Farrah Fawcett dying
-    'eddings', 'david eddings',  # mentions of David Eddings dying
+    'farrah', 'farrah fawcett', 'fawcett',  # mentions of Farrah Fawcett dying
+    'eddings', 'david eddings',  # mentions of David Eddings dying,
+    'carradin', 'carradine', 'david carradin', 'david carradine'  # mentions of David Carradine dying
     'ceci', 'bro ceci',  # mentions of Bro Ceci dying
     'os3',  # mentions of iPhone OS3 not working..? I think
     'fuzzball'  # some random fuzzball spam
@@ -64,10 +63,11 @@ def default_operations(with_bigrams=False):
     print('Classifier trained')
     acc1 = perform_test('sentiment140_train', 'sentiment140_test')
     acc2 = perform_test('sentiment140_train', 'sanders')
+    load_pickled(file_names['sentiment140_train']['classifier']).show_most_informative_features(n=25)
     print('Accuracy of sentiment140 train set:')
     print('on sentiment140 test = {}'.format(acc1))
-    print('on Sanders = {}', acc2)
-    print('average = {}', (acc1 + acc2) / 2)
+    print('on Sanders = {}'.format(acc2))
+    print('average = {}'.format((acc1 + acc2) / 2))
 
 
 def save_processed(data_type):
@@ -150,32 +150,27 @@ def get_best_ngrams(pos_tweets, neg_tweets, with_unigrams=True, with_bigrams=Fal
 
 def get_processed_tweets(data_type):
     pos_tweets, neg_tweets = get_all_tweets(data_type)
-    if data_type == 'sentiment140_train':
-        pos_tweets = process_tweets_sentiment140_train(pos_tweets)
-        neg_tweets = process_tweets_sentiment140_train(neg_tweets)
-    else:
-        pos_tweets = process_tweets(pos_tweets)
-        neg_tweets = process_tweets(neg_tweets)
+    pos_tweets = process_tweets(pos_tweets, data_type == 'sentiment140_train')
+    neg_tweets = process_tweets(neg_tweets, data_type == 'sentiment140_train')
     return pos_tweets, neg_tweets
 
 
-def process_tweets(tweets):
-    return [preprocess_tweet_phase3(
-        preprocess_tweet_phase2(
-            preprocess_tweet_phase1(t)
-        )
-    ) for t in tweets]
+def process_tweets(tweets, is_sentiment140):
+    if is_sentiment140:
+        pre_fn = remove_sentiment140_words
+    else:
+        pre_fn = None
 
-
-def process_tweets_sentiment140_train(tweets):
     results = []
     for t in tweets:
-        t = preprocess_tweet_phase2(preprocess_tweet_phase1(t))
-        for w in _to_remove_sentiment140:
-            t = t.replace(w, '')
-        results.append(preprocess_tweet_phase3(t))
-
+        temp = preprocess_tweet(t, pre4=pre_fn)
+        if temp is not None:
+            results.append(temp)
     return results
+
+
+def remove_sentiment140_words(words):
+    return [w for w in words if w not in _to_remove_sentiment140]
 
 
 def get_all_unigrams(tweets):

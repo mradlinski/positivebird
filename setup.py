@@ -6,7 +6,7 @@ config = {
     'url': 'https://github.com/mromnia/positivebird',
     'author_email': 'mr.omnia.dev@gmail.com',
     'version': '0.1',
-    'install_requires': ['flask', 'twitter', 'nltk', 'psycopg2', 'requests'],
+    'install_requires': ['flask', 'twitter', 'nltk', 'requests'],
     'packages': ['positivebird'],
     'name': 'positivebird'
 }
