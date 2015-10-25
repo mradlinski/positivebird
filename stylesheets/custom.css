@@ -6,6 +6,7 @@
 }
 .show-more {
     display: none;
+	cursor: pointer;
 }
 .embedded-tweet:after {
     content: " ";
@@ -17,6 +18,29 @@
 }
 .tweet-list {
     display: none;
+}
+.tweet-list-element p {
+	text-align: center;
+	margin: 5px;
+}
+.tweet-list-element {
+	padding: 2px;
+	border: 2px solid;
+	border-radius: 6px;
+	margin: 10px;
+	color: black;
+}
+.tweet-list-element.positive {
+	background-color: #E0FFE0;
+	border-color: #B9FFB9;
+}
+.tweet-list-element.negative {
+	background-color: #FD8E8E;
+	border-color: #FF0000;
+}
+.tweet-list-element.neutral {
+	background-color: #FFFFFF;
+	border-color: #D3D3D3;
 }
 .loading-image {
 	width: 100%;

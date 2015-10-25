@@ -63,7 +63,7 @@
 
     <script id="tweet-embed" type="text/template">
         <div class="embedded-tweet">
-            <blockquote class="twitter-tweet" align="left" width="350" data-cards="hidden" data-conversation="none">
+            <blockquote class="twitter-tweet" align="center" width="450" data-cards="hidden" data-conversation="none">
                 <a href="https://twitter.com/twitter/status/<%- id %>"></a>
             </blockquote>
         </div>
@@ -94,21 +94,19 @@
 
         <div class="tweet-list">
             <% for(var i = 0, len = tweets.length; i < len; ++i) { %>
-                <div class="tweet-list-element">
+                <div class="tweet-list-element
+					<% if(labelSentiment(tweets[i].sentiment) === 'neg') { %>
+					negative"><p>negative
+					<% } else if(labelSentiment(tweets[i].sentiment) === 'pos') { %>
+					positive"><p>positive
+					<% } else { %>
+					neutral"><p>neutral
+					<% } %>
+					(<%= (tweets[i].sentiment * 100).toFixed(3) %>% positivity)
+					</p>
                     <%= tweetTemplate({
                         id: tweets[i].id
                     }) %>
-                    <p>
-                        <% if(tweets[i].sentiment < 0.4) { %>
-                            <span class="negative">negative
-                        <% } else if(tweets[i].sentiment > 0.6) { %>
-                            <span class="positive">positive
-                        <% } else { %>
-                            <span class="neutral">neutral
-                        <% } %>
-                                (<%= (tweets[i].sentiment * 100).toFixed(3) %>% positivity)
-                            </span>
-                    </p>
                 </div>
             <% } %>
         </div>
@@ -125,80 +123,107 @@
     <script src="javascripts/underscore-min.js"></script>
 
     <script type="text/javascript">
-        var input = $('#tweet-input');
-        var sentimentForm = $('#sentiment-form');
-        var results = $('#results-section');
-        var resultTemplate = _.template($('#analysis-result').html());
-        var tweetTemplate = _.template($('#tweet-embed').html());
-		var loadingTemplate = $('#loading-template').html();
+		var serverAddress = 'http://51.254.200.236/';
 
-        var loadingLock = false;
+		$.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+			options.crossDomain ={
+				crossDomain: true
+			};
+			options.xhrFields = {
+				withCredentials: true
+			};
+		});
 
-        function loadTweets() {
-            twttr.widgets.load();
-        }
-
-        function show(el, dur, callback) {
-            callback = callback || function() {};
-            el.fadeIn({
-                duration: dur,
-                complete: callback,
-                easing: 'linear'
-            });
-        }
-
-        function getSentiment() {
-            if(loadingLock) {
-                return;
-            }
-            loadingLock = true;
-
-            var username = input.val();
-            if (username[0] === '@')
-                username = username.substring(1);
-
-            if (!/[a-zA-Z0-9_]{1,15}/.test(username)) {
-                input.val('');
-				loadingLock = false;
-                return alert('Invalid username!');
-            }
-
-            results.html(loadingTemplate);
-
-            $.get('http://51.254.200.236/user/' + encodeURIComponent(username), function(data, statusText, jXHR) {
-                data = data.data;
-                results.html(resultTemplate({
-                    username: username,
-                    sentiment: data.avg_sentiment,
-                    tweets: data.sentiments,
-                    tweetTemplate: tweetTemplate
-                }));
-
-                show(results, 500, function() {
-                    show(results.find('.analysis-sentiment'), 2000, function() {
-                        loadingLock = false;
-                        show(results.find('.show-more'), 1000, function() {
-                            loadTweets();
-                        });
-                        results.find('.show-more').click(function() {
-                            results.find('.tweet-list').show(500);
-                        });
-                    });
-                });
-            })
-			.fail(function() {
-				results.html('An error occurred... Try again!');
-				show(results, 200, function() {
-					loadingLock = false;
-				});
-				return;
-			});
+		function labelSentiment(sentiment) {
+			if(sentiment < 0.4) {
+				return 'neg';
+			} else if(sentiment > 0.6) {
+				return 'pos';
+			} else {
+				return 'neutral';
+			}
 		}
 
-        sentimentForm.submit(function(e) {
-			getSentiment();
-			e.preventDefault();
-			return false;
+		$(document).ready(function() {
+			$.get(serverAddress + 'session');
+
+
+			var input = $('#tweet-input');
+	        var sentimentForm = $('#sentiment-form');
+	        var results = $('#results-section');
+	        var resultTemplate = _.template($('#analysis-result').html());
+	        var tweetTemplate = _.template($('#tweet-embed').html());
+			var loadingTemplate = $('#loading-template').html();
+
+	        var loadingLock = false;
+
+	        function loadTweets() {
+	            twttr.widgets.load();
+	        }
+
+	        function show(el, dur, callback) {
+	            callback = callback || function() {};
+	            el.fadeIn({
+	                duration: dur,
+	                complete: callback,
+	                easing: 'linear'
+	            });
+	        }
+
+	        function getSentiment() {
+	            if(loadingLock) {
+	                return;
+	            }
+	            loadingLock = true;
+
+	            var username = input.val();
+	            if (username[0] === '@')
+	                username = username.substring(1);
+
+	            if (!/[a-zA-Z0-9_]{1,15}/.test(username)) {
+	                input.val('');
+					loadingLock = false;
+	                return alert('Invalid username!');
+	            }
+
+	            results.html(loadingTemplate);
+
+	            $.get(serverAddress + 'user/' + encodeURIComponent(username), function(data, statusText, jXHR) {
+	                data = data.data;
+	                results.html(resultTemplate({
+	                    username: username,
+	                    sentiment: data.avg_sentiment,
+	                    tweets: data.sentiments,
+	                    tweetTemplate: tweetTemplate,
+						labelSentiment: labelSentiment
+	                }));
+
+	                show(results, 500, function() {
+	                    show(results.find('.analysis-sentiment'), 2000, function() {
+	                        loadingLock = false;
+	                        show(results.find('.show-more'), 1000, function() {
+	                            loadTweets();
+	                        });
+	                        results.find('.show-more').click(function() {
+	                            results.find('.tweet-list').show(500);
+	                        });
+	                    });
+	                });
+	            })
+				.fail(function() {
+					results.html('An error occurred... Try again!');
+					show(results, 200, function() {
+						loadingLock = false;
+					});
+					return;
+				});
+			}
+
+	        sentimentForm.submit(function(e) {
+				getSentiment();
+				e.preventDefault();
+				return false;
+			});
 		});
     </script>
 
