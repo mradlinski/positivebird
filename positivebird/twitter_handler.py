@@ -4,7 +4,8 @@ from .util import get_config
 config = get_config()['twitter']
 
 if config['app_auth']:
-    bearer_token = oauth2_dance(config['consumer_key'], config['consumer_secret'])
+    bearer_token = oauth2_dance(config['consumer_key'],
+                                config['consumer_secret'])
 
     t = Twitter(auth=OAuth2(
         bearer_token=bearer_token

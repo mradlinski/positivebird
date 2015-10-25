@@ -1,4 +1,3 @@
-from positivebird.web import app
+from positivebird.web import init
 
-if __name__ == '__main__':
-    app.run()
+app = init()

@@ -4,7 +4,6 @@ from nltk.metrics import BigramAssocMeasures
 from nltk.probability import FreqDist, ConditionalFreqDist
 import nltk.classify.util
 from nltk import NaiveBayesClassifier
-from nltk import MaxentClassifier
 
 from .preprocessing import tweet_to_features, preprocess_tweet
 from .corpus_preprocessing import get_all_tweets
@@ -34,7 +33,7 @@ file_names = {
     }
 }
 
-_best_unigram_cutoff = 4765
+_best_unigram_cutoff = 5000
 _best_bigram_cutoff = 200
 
 _to_remove_sentiment140 = [  # removing some quirks of the sentiment140 data
@@ -42,7 +41,8 @@ _to_remove_sentiment140 = [  # removing some quirks of the sentiment140 data
     'mahon', 'mcmahon', 'ed mcmahon',  # mentions of Ed McMahon dying
     'farrah', 'farrah fawcett', 'fawcett',  # mentions of Farrah Fawcett dying
     'eddings', 'david eddings',  # mentions of David Eddings dying,
-    'carradin', 'carradine', 'david carradin', 'david carradine'  # mentions of David Carradine dying
+    'carradin', 'carradine',
+    'david carradin', 'david carradine'  # mentions of David Carradine dying
     'ceci', 'bro ceci',  # mentions of Bro Ceci dying
     'os3',  # mentions of iPhone OS3 not working..? I think
     'fuzzball'  # some random fuzzball spam
@@ -63,7 +63,9 @@ def default_operations(with_bigrams=False):
     print('Classifier trained')
     acc1 = perform_test('sentiment140_train', 'sentiment140_test')
     acc2 = perform_test('sentiment140_train', 'sanders')
-    load_pickled(file_names['sentiment140_train']['classifier']).show_most_informative_features(n=25)
+    load_pickled(
+        file_names['sentiment140_train']['classifier']
+    ).show_most_informative_features(n=25)
     print('Accuracy of sentiment140 train set:')
     print('on sentiment140 test = {}'.format(acc1))
     print('on Sanders = {}'.format(acc2))
@@ -78,7 +80,8 @@ def save_processed(data_type):
 def save_ngrams(data_type, with_unigrams=True, with_bigrams=False):
     pos_tweets, neg_tweets = load_pickled(file_names[data_type]['processed'])
 
-    unigrams, bigrams = get_best_ngrams(pos_tweets, neg_tweets, with_unigrams, with_bigrams)
+    unigrams, bigrams = get_best_ngrams(pos_tweets, neg_tweets,
+                                        with_unigrams, with_bigrams)
     save_pickled(unigrams, file_names[data_type]['unigrams'])
     save_pickled(bigrams, file_names[data_type]['bigrams'])
 
@@ -103,7 +106,8 @@ def perform_test(train_data_type, test_data_type):
     bigrams = load_pickled(file_names[train_data_type]['bigrams'])
     classifier = load_pickled(file_names[train_data_type]['classifier'])
 
-    accuracy = test_classifier(classifier, pos_tweets, neg_tweets, unigrams, bigrams)
+    accuracy = test_classifier(classifier, pos_tweets, neg_tweets,
+                               unigrams, bigrams)
     return accuracy
 
 
@@ -128,7 +132,8 @@ def tweets_to_features(pos_tweets, neg_tweets, unigrams, bigrams):
     ]
 
 
-def get_best_ngrams(pos_tweets, neg_tweets, with_unigrams=True, with_bigrams=False):
+def get_best_ngrams(pos_tweets, neg_tweets, with_unigrams=True,
+                    with_bigrams=False):
     words_pos = get_all_unigrams(pos_tweets)
     words_neg = get_all_unigrams(neg_tweets)
 
@@ -212,15 +217,18 @@ def get_best_unigrams(words_pos, words_neg):
         )
         word_scores[word] = pos_score + neg_score
 
-    best = sorted(word_scores.items(), key=lambda t: t[1], reverse=True)[:_best_unigram_cutoff]
-    bestwords = set([w for w, s in best])
+    best = sorted(word_scores.items(),
+                  key=lambda t: t[1],
+                  reverse=True)[:_best_unigram_cutoff]
+    best_words = set([w for w, s in best])
 
-    return bestwords
+    return best_words
 
 
 def get_best_bigrams(words):
     bigram_finder = BigramCollocationFinder.from_words(words)
-    bigrams = bigram_finder.nbest(BigramAssocMeasures.chi_sq, _best_bigram_cutoff)
+    bigrams = bigram_finder.nbest(BigramAssocMeasures.chi_sq,
+                                  _best_bigram_cutoff)
     return set(bigrams)
 
 

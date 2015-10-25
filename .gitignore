@@ -3,6 +3,7 @@ bin/*
 data/*
 !bin/.gitkeep
 !bin/sentiment140_train_classifier.pickle
+!bin/sentiment140_train_unigrams.pickle
 !data/.gitkeep
 !data/sanders.csv
 __pycache__/

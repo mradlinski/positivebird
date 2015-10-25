@@ -1,18 +1,29 @@
 from sys import argv
 import os
+
+from flask.ext.script import Manager
+from flask.ext.migrate import Migrate, MigrateCommand
+
+from .db import init_db
+from .web import app, run
 from .corpus_preprocessing import \
     process_sentiment140, process_sanders, download_sentiment140
-from .training import \
-    default_operations, save_processed, save_ngrams, save_classifier, perform_test
+from .training import default_operations, save_processed, \
+    save_ngrams, save_classifier, perform_test
 from .util import get_config
+
+db = init_db(app)
+migrate = Migrate(app, db)
+
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 
 
 def main():
     argc = len(argv)
 
     if argc < 2 or argv[1] == 'server':
-        from .web import app
-        app.run(host='0.0.0.0')
+        run()
     elif argv[1] == 'download_sentiment140':
         download_sentiment140()
     elif argv[1] == 'corpus':
@@ -49,3 +60,5 @@ def main():
                 print(perform_test(argv[3], argv[4]))
             else:
                 raise RuntimeError('Invalid training command')
+    else:
+        manager.run()

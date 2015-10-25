@@ -1,19 +1,23 @@
 {
-	"twitter": {
-		"consumer_key": "",
-		"consumer_secret": "",
-		"access_token": "",
-		"access_secret": "",
-		"app_auth": true
-	},
-	"debug": true,
-	"used_classifier": "sentiment140_train",
-	"use_bigrams": false,
-	"bin_folder": "bin/",
-	"data_folder": "data/",
-	"data_filenames": {
-		"sentiment140_train": "sentiment140_train.csv",
-		"sentiment140_test": "sentiment140_test.csv",
-		"sanders": "sanders.csv"
-	}
+    "twitter": {
+        "consumer_key": "",
+        "consumer_secret": "",
+        "access_token": "",
+        "access_secret": "",
+        "app_auth": true
+    },
+    "debug": true,
+    "used_classifier": "sentiment140_train",
+    "use_bigrams": false,
+    "bin_folder": "bin/",
+    "data_folder": "data/",
+    "data_filenames": {
+        "sentiment140_train": "sentiment140_train.csv",
+        "sentiment140_test": "sentiment140_test.csv",
+        "sanders": "sanders.csv"
+    },
+    "db": {
+        "SQLALCHEMY_DATABASE_URI": "postgresql://user:pass@host:port/database",
+        "SQLALCHEMY_TRACK_MODIFICATIONS": false
+    }
 }
