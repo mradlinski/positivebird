@@ -123,7 +123,7 @@ def calc_positivity(username):
 
 @app.after_request
 def cors(res):
-    res.headers['Access-Control-Allow-Origin'] = 'null'
+    res.headers['Access-Control-Allow-Origin'] = 'http://mromnia.github.io'
     res.headers['P3P'] = 'CP="NOI ADM DEV PSAi COM NAV OUR OTRo STP IND DEM"'
     res.headers['Access-Control-Allow-Methods'] = 'GET,POST'
     res.headers['Access-Control-Allow-Credentials'] = 'true'
