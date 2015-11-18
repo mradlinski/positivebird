@@ -27,7 +27,7 @@ def get_session_id(generate=False):
         if generate:
             session_id = uuid.uuid4().urn[9:]
         else:
-            raise ValueError()
+            session_id = 'None'
     return session_id
 
 
@@ -39,7 +39,7 @@ def options(path):
 @app.route('/session', methods=['GET'])
 def start_session():
     session_id = get_session_id(generate=True)
-    lookup = Visit(session_id, request.remote_addr)
+    lookup = Visit(session_id)
     db.session.add(lookup)
     db.session.commit()
 
@@ -58,7 +58,7 @@ def label_tweet(tweet_id, label):
         if label not in {'pos', 'neg', 'neutral'}:
             raise ValueError
         session_id = get_session_id()
-        labeling = DataLabel(tweet_id, label, session_id, request.remote_addr)
+        labeling = DataLabel(tweet_id, label, session_id)
         db.session.add(labeling)
         db.session.commit()
     except Exception as e:
@@ -105,20 +105,10 @@ def calc_positivity(username):
         err = e.args[0]
         print(e, file=sys.stderr)
     finally:
-        lookup = UserLookup(username, sentiment, session_id,
-                            request.remote_addr, err)
+        lookup = UserLookup(username, sentiment, session_id, err)
         db.session.add(lookup)
         db.session.commit()
         return json_response(response, err)
-
-
-# @app.route('/text/<text>', methods=['GET'])
-# def tweet_pos(text):
-#     if len(text) > 200:
-#         return json_response(None, 'Text too long')
-#     return jsonify({
-#         'sentiment': classifier.classify(text)
-#     })
 
 
 @app.after_request
