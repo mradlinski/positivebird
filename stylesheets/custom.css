@@ -1,5 +1,14 @@
 #tweet-input {
     width: 100%;
+    font: 14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#submit-button {
+    width: 100%;
+    text-align: center;
+}
+#submit-button > button {
+    margin: 10px auto;
+    font: 14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .analysis-sentiment {
     display: none;
