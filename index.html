@@ -36,18 +36,22 @@
         <header>
             <h1>PositiveBird</h1>
             <p>A terribly flawed tool to check how positive someone is on Twitter!</p>
-            <p>It works only for English tweets, but will return some random results for non-English ones.</p>
-            <p>An error occurring might mean an invalid Twitter username or no tweets found for that user.</p>
-            <p>If you click <i>Show more tweets</i> keep in mind that it means <strong>downloading 200 tweets</strong> - it might take a moment.</p>
+
             <p>
 				<form id="sentiment-form">
-                	<input id="tweet-input" type="text" placeholder="type somebody's username here!" />
+                    <label for="tweet-input"><h3>Type somebody's username here:</h3></label>
+                	<input id="tweet-input" type="text" placeholder="type somebody's username here!" value="barackobama" />
 
                     <div id="submit-button">
     					<button type="submit">Submit</button>
                     </div>
 				</form>
             </p>
+
+            <p>It works only for English tweets, but will return some random results for non-English ones.</p>
+            <p>An error occurring might mean an invalid Twitter username or no tweets found for that user.</p>
+            <p>If you click <i>Show more tweets</i> keep in mind that it means <strong>downloading 200 tweets</strong> - it might take a moment.</p>
+
             <p class="view"><a href="http://github.com/mromnia/positivebird">View the Project on GitHub <small>mromnia/positivebird</small></a></p>
             <ul>
                 <li><a href="https://github.com/orderedlist/minimal/zipball/master">Download <strong>ZIP File</strong></a></li>
