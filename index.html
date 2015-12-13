@@ -205,11 +205,10 @@
 	                show(results, 500, function() {
 	                    show(results.find('.analysis-sentiment'), 2000, function() {
 	                        loadingLock = false;
-	                        show(results.find('.show-more'), 1000, function() {
-	                            loadTweets();
-	                        });
+	                        show(results.find('.show-more'), 1000);
 	                        results.find('.show-more').click(function() {
 	                            results.find('.tweet-list').show(500);
+								loadTweets();
 	                        });
 	                    });
 	                });
