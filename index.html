@@ -98,7 +98,7 @@
 
         <div class="tweet-list">
             <% for(var i = 0, len = tweets.length; i < len; ++i) { %>
-                <div class="tweet-list-element
+                <div id="tweet-<%= i %>" class="tweet-list-element
 					<% if(labelSentiment(tweets[i].sentiment) === 'neg') { %>
 					negative"><p>negative
 					<% } else if(labelSentiment(tweets[i].sentiment) === 'pos') { %>
@@ -161,8 +161,19 @@
 
 	        var loadingLock = false;
 
-	        function loadTweets() {
-	            twttr.widgets.load();
+	        function loadTweets(i) {
+				i = i || 0;
+				
+				var tweet = document.getElementById('tweet-' + i);
+				
+				if(!tweet) {
+					return;
+				}
+				
+	            twttr.widgets.load(tweet);
+				setTimeout(function() {
+					loadTweets(i + 1);
+				}, 300);
 	        }
 
 	        function show(el, dur, callback) {
