@@ -3,7 +3,7 @@
 A python web app that uses sentiment analysis on a Twitter user's tweets.
 
 ### Tools: 
-- _NLTK_ - for various NLP task, including sentiment analysis itself (with the Naive Bayes Classifier)
+- _NLTK_ - for various NLP tasks, including sentiment analysis itself (with the Naive Bayes Classifier)
 - _twitter_ - Python package used to download tweets
 - _flask_ - to expose the NLP functionality via an HTTP API
 - _PostgreSQL + psycopg2 + SQLAlchemy_ - to track what users are searching for and hopefully, in the future, allow them to disagree with the analysis and give their own opinion
